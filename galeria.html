@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina - Galería Fotográfica Interactive</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-primary: #6366f1;
+            --brand-primary-hover: #4f46e5;
+            --brand-accent: #ec4899;
+            --card-radius: 1rem;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Hero Header Styling */
+        .hero-section {
+            background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+            padding: 3.5rem 0 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Toolbar Glassmorphism */
+        .toolbar-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--card-radius);
+        }
+
+        /* Filter Pills */
+        .nav-pills .nav-link {
+            color: #94a3b8;
+            border-radius: 50rem;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+            border: 1px solid transparent;
+        }
+
+        .nav-pills .nav-link:hover {
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--brand-primary);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Gallery Cards Grid */
+        .gallery-card {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            background: #1e293b;
+            transition: var(--transition-smooth);
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        .img-wrapper {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            background-color: #334155;
+            cursor: pointer;
+        }
+
+        .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-card:hover .img-wrapper img {
+            transform: scale(1.08);
+        }
+
+        /* Card Overlay Effects */
+        .card-img-overlay-custom {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 1rem;
+        }
+
+        .gallery-card:hover .card-img-overlay-custom {
+            opacity: 1;
+        }
+
+        /* Like Button Animations */
+        .btn-like {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f8fafc;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-like:hover {
+            background: rgba(236, 72, 153, 0.2);
+            border-color: var(--brand-accent);
+            color: var(--brand-accent);
+        }
+
+        .btn-like.liked {
+            background: var(--brand-accent);
+            border-color: var(--brand-accent);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(236, 72, 153, 0.5);
+        }
+
+        .btn-like.liked i {
+            animation: heartPulse 0.4s ease forwards;
+        }
+
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* List View Customization */
+        .view-list .gallery-item {
+            width: 100% !important;
+        }
+
+        .view-list .gallery-card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .view-list .img-wrapper {
+            width: 280px;
+            height: 190px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .view-list .gallery-card {
+                flex-direction: column;
+            }
+            .view-list .img-wrapper {
+                width: 100%;
+                height: 220px;
+            }
+        }
+
+        /* Lightbox Custom Styles */
+        .lightbox-modal .modal-content {
+            background-color: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1.25rem;
+            overflow: hidden;
+        }
+
+        .lightbox-img-container {
+            position: relative;
+            background-color: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            max-height: 75vh;
+        }
+
+        .lightbox-img-container img {
+            max-height: 75vh;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .nav-btn-modal {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: var(--transition-smooth);
+            z-index: 10;
+        }
+
+        .nav-btn-modal:hover {
+            background: var(--brand-primary);
+            color: white;
+            border-color: var(--brand-primary);
+        }
+
+        .nav-btn-prev { left: 1rem; }
+        .nav-btn-next { right: 1rem; }
+
+        /* Badge Pills */
+        .badge-category {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            color: #a5b4fc;
+            font-weight: 600;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            z-index: 1090;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="hero-section text-center mb-4">
+        <div class="container">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-body-tertiary border border-secondary border-opacity-25 mb-3">
+                <i class="bi bi-stars text-warning fs-6"></i>
+                <span class="small fw-semibold">Explora la colección 2026</span>
+            </div>
+            <h1 class="display-4 fw-extrabold mb-2">Galería <span class="gradient-text">Lumina</span></h1>
+            <p class="text-secondary lead max-w-2xl mx-auto mb-4" style="max-width: 600px;">
+                Colección de fotografía en alta definición. Filtra, busca y descarga momentos visuales extraordinarios.
+            </p>
+            
+            <!-- Quick Stats Bar -->
+            <div class="d-flex justify-content-center gap-4 text-center mt-3">
+                <div>
+                    <span class="h5 fw-bold mb-0 text-white d-block" id="stat-total-photos">0</span>
+                    <span class="small text-secondary">Fotografías</span>
+                </div>
+                <div class="border-start border-secondary opacity-25"></div>
+                <div>
+                    <span class="h5 fw-bold mb-0 text-white d-block" id="stat-total-likes">0</span>
+                    <span class="small text-secondary">Me gusta totales</span>
+                </div>
+                <div class="border-start border-secondary opacity-25"></div>
+                <div>
+                    <span class="h5 fw-bold mb-0 text-white d-block">4K</span>
+                    <span class="small text-secondary">Resolución</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container pb-5">
+        <!-- Control Toolbar Card -->
+        <div class="toolbar-card p-3 p-md-4 mb-4 shadow-lg">
+            <div class="row g-3 align-items-center">
+                
+                <!-- Search Box -->
+                <div class="col-12 col-lg-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary border-secondary border-opacity-25 text-secondary">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="search-input" class="form-control bg-body-tertiary border-secondary border-opacity-25" placeholder="Buscar por título, etiqueta, lugar..." aria-label="Buscar imágenes">
+                        <button class="btn btn-outline-secondary border-opacity-25" type="button" id="btn-clear-search" style="display: none;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sorting Dropdown -->
+                <div class="col-6 col-sm-6 col-lg-3 offset-lg-2">
+                    <div class="input-group">
+                        <label class="input-group-text bg-body-tertiary border-secondary border-opacity-25 text-secondary" for="sort-select">
+                            <i class="bi bi-sort-down"></i>
+                        </label>
+                        <select class="form-select bg-body-tertiary border-secondary border-opacity-25" id="sort-select">
+                            <option value="popular" selected>Más populares</option>
+                            <option value="recent">Más recientes</option>
+                            <option value="alpha-asc">Nombre (A - Z)</option>
+                            <option value="alpha-desc">Nombre (Z - A)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- View Mode Toggle -->
+                <div class="col-6 col-sm-6 col-lg-3 text-end">
+                    <div class="btn-group w-100" role="group" aria-label="Modo de vista">
+                        <button type="button" class="btn btn-outline-secondary border-opacity-25 active" id="btn-view-grid" title="Vista en Cuadrícula">
+                            <i class="bi bi-grid-3x3-gap-fill me-1"></i> Cuadrícula
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary border-opacity-25" id="btn-view-list" title="Vista en Lista">
+                            <i class="bi bi-list-ul me-1"></i> Lista
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Filters Horizontal Scroll -->
+                <div class="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
+                    <ul class="nav nav-pills flex-nowrap overflow-x-auto pb-2" id="category-pills">
+                        <li class="nav-item">
+                            <button class="nav-link active text-nowrap" data-category="todos">
+                                <i class="bi bi-grid-fill me-1"></i> Todos
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link text-nowrap" data-category="naturaleza">
+                                <i class="bi bi-tree-fill me-1"></i> Naturaleza
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link text-nowrap" data-category="arquitectura">
+                                <i class="bi bi-building-fill me-1"></i> Arquitectura
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link text-nowrap" data-category="tecnologia">
+                                <i class="bi bi-cpu-fill me-1"></i> Tecnología
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link text-nowrap" data-category="arte">
+                                <i class="bi bi-palette-fill me-1"></i> Arte
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link text-nowrap" data-category="retratos">
+                                <i class="bi bi-person-bounding-box me-1"></i> Retratos
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Gallery Container -->
+        <div id="gallery-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 transition-all">
+            <!-- Dynamic Image Cards injected via JavaScript -->
+        </div>
+
+        <!-- Empty Results Message -->
+        <div id="empty-state" class="text-center py-5 d-none">
+            <div class="py-4">
+                <i class="bi bi-image-alt display-1 text-secondary opacity-50 mb-3 d-block"></i>
+                <h4 class="fw-bold">No se encontraron fotografías</h4>
+                <p class="text-secondary mb-3">Intenta cambiar la palabra clave o seleccionar otra categoría.</p>
+                <button class="btn btn-indigo text-white px-4 rounded-pill" style="background: var(--brand-primary);" id="btn-reset-filters">
+                    Restablecer Filtros
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div class="modal fade lightbox-modal" id="lightboxModal" tabindex="-1" aria-labelledby="lightboxModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                
+                <!-- Modal Header -->
+                <div class="modal-header border-bottom border-secondary border-opacity-10 py-2 px-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge badge-category rounded-pill px-3 py-1" id="modal-category">Categoría</span>
+                        <h6 class="modal-title mb-0 text-white fw-bold" id="lightboxModalLabel">Título de la foto</h6>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <!-- Modal Body: Image & Navigation -->
+                <div class="modal-body p-0">
+                    <div class="lightbox-img-container">
+                        <!-- Navigation Arrows -->
+                        <button class="nav-btn-modal nav-btn-prev" id="modal-btn-prev" title="Anterior (Flecha Izquierda)">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="nav-btn-modal nav-btn-next" id="modal-btn-next" title="Siguiente (Flecha Derecha)">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+
+                        <!-- High Res Image -->
+                        <img id="modal-image" src="" alt="Vista previa HD" class="img-fluid">
+                    </div>
+
+                    <!-- Modal Details Panel -->
+                    <div class="p-3 p-md-4 bg-slate-900 border-top border-secondary border-opacity-10">
+                        <div class="row g-3 align-items-center">
+                            
+                            <!-- Author & Location -->
+                            <div class="col-12 col-md-6">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img id="modal-author-avatar" src="" alt="Autor" class="rounded-circle border border-secondary" width="48" height="48">
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-white" id="modal-author-name">Nombre Autor</h6>
+                                        <p class="small text-secondary mb-0">
+                                            <i class="bi bi-geo-alt me-1"></i><span id="modal-location">Ubicación</span> &bull; 
+                                            <i class="bi bi-calendar3 ms-1 me-1"></i><span id="modal-date">Fecha</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions & Metadata -->
+                            <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center gap-2">
+                                <button id="modal-like-btn" class="btn btn-like rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-heart-fill"></i>
+                                    <span id="modal-like-count">0</span> Me gusta
+                                </button>
+                                <button id="modal-download-btn" class="btn btn-primary rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2" style="background: var(--brand-primary); border: none;">
+                                    <i class="bi bi-download"></i> Descargar HD
+                                </button>
+                            </div>
+
+                            <!-- Tags & Technical details -->
+                            <div class="col-12 pt-2 border-top border-secondary border-opacity-10 mt-3">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                    <div class="d-flex flex-wrap gap-1 align-items-center" id="modal-tags-container">
+                                        <!-- Badges will be generated -->
+                                    </div>
+                                    <span class="small text-secondary" id="modal-camera-info">
+                                        <i class="bi bi-camera me-1"></i> Sony Alpha A7 IV
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast align-items-center text-bg-dark border-secondary border-opacity-25 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i id="toast-icon" class="bi bi-check-circle-fill text-success fs-5"></i>
+                    <span id="toast-message">Acción completada con éxito.</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Photographic Dataset with High Quality Unsplash Images
+        const galleryData = [
+            {
+                id: 1,
+                title: "Montañas bajo la Vía Láctea",
+                category: "naturaleza",
+                categoryName: "Naturaleza",
+                url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+                author: "Mateo Silva",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
+                location: "Patagonia, Chile",
+                date: "2026-02-10",
+                likes: 342,
+                isLiked: false,
+                camera: "Canon EOS R5 &bull; 24mm &bull; f/2.8 &bull; 15s",
+                tags: ["Montañas", "Cielo Nocturno", "Aventura", "Naturaleza"]
+            },
+            {
+                id: 2,
+                title: "Rascacielos Futuristas en Neón",
+                category: "arquitectura",
+                categoryName: "Arquitectura",
+                url: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80",
+                author: "Elena Rostova",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80",
+                location: "Tokio, Japón",
+                date: "2026-01-18",
+                likes: 512,
+                isLiked: true,
+                camera: "Sony A7R V &bull; 35mm &bull; f/1.8 &bull; 1/160s",
+                tags: ["Ciudad", "Luces", "Futurismo", "Noche"]
+            },
+            {
+                id: 3,
+                title: "Circuito Cuántico Abstracto",
+                category: "tecnologia",
+                categoryName: "Tecnología",
+                url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+                author: "David Chen",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80",
+                location: "Silicon Valley, EE.UU.",
+                date: "2026-03-01",
+                likes: 289,
+                isLiked: false,
+                camera: "Nikon Z9 &bull; 50mm Macro &bull; f/4 &bull; 1/250s",
+                tags: ["Hardware", "Chips", "Innovación", "IA"]
+            },
+            {
+                id: 4,
+                title: "Sinfonía de Colores Acrílicos",
+                category: "arte",
+                categoryName: "Arte",
+                url: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1200&q=80",
+                author: "Sofia Morales",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
+                location: "Barcelona, España",
+                date: "2025-11-22",
+                likes: 410,
+                isLiked: false,
+                camera: "Fujifilm X-T5 &bull; 56mm &bull; f/1.2 &bull; 1/500s",
+                tags: ["Pintura", "Abstracto", "Color", "Moderno"]
+            },
+            {
+                id: 5,
+                title: "Retrato de Luces de Neón",
+                category: "retratos",
+                categoryName: "Retratos",
+                url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80",
+                author: "Lucas Benítez",
+                avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=80",
+                location: "Berlín, Alemania",
+                date: "2026-02-28",
+                likes: 678,
+                isLiked: true,
+                camera: "Sony A7 IV &bull; 85mm &bull; f/1.4 &bull; 1/200s",
+                tags: ["Estilo", "Moda", "Neón", "Urbano"]
+            },
+            {
+                id: 6,
+                title: "Bosque Envuelto en Niebla",
+                category: "naturaleza",
+                categoryName: "Naturaleza",
+                url: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80",
+                author: "Clara Vance",
+                avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80",
+                location: "Selva Negra, Alemania",
+                date: "2025-12-05",
+                likes: 195,
+                isLiked: false,
+                camera: "Canon EOS R6 &bull; 70-200mm &bull; f/4 &bull; 1/125s",
+                tags: ["Bosque", "Misterio", "Verde", "Arboles"]
+            },
+            {
+                id: 7,
+                title: "Puente Geométrico Minimalista",
+                category: "arquitectura",
+                categoryName: "Arquitectura",
+                url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
+                author: "Adrian Dupont",
+                avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&q=80",
+                location: "Copenhague, Dinamarca",
+                date: "2026-03-10",
+                likes: 310,
+                isLiked: false,
+                camera: "Leica SL2 &bull; 24mm &bull; f/8 &bull; 1/320s",
+                tags: ["Minimalismo", "Líneas", "Estructura", "Blanco"]
+            },
+            {
+                id: 8,
+                title: "Realidad Virtual y Futuro",
+                category: "tecnologia",
+                categoryName: "Tecnología",
+                url: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=1200&q=80",
+                author: "David Chen",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80",
+                location: "Seúl, Corea del Sur",
+                date: "2026-02-14",
+                likes: 450,
+                isLiked: true,
+                camera: "Sony A7S III &bull; 35mm &bull; f/2.0 &bull; 1/100s",
+                tags: ["Metaverso", "Gaming", "Imersión", "Visor"]
+            },
+            {
+                id: 9,
+                title: "Escultura de Cristal y Luz",
+                category: "arte",
+                categoryName: "Arte",
+                url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=80",
+                author: "Sofia Morales",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
+                location: "París, Francia",
+                date: "2026-01-30",
+                likes: 230,
+                isLiked: false,
+                camera: "Nikon Z7 II &bull; 50mm &bull; f/1.8 &bull; 1/400s",
+                tags: ["Escultura", "Galería", "Exposición", "Luz"]
+            },
+            {
+                id: 10,
+                title: "Expresión Exótica en la Ciudad",
+                category: "retratos",
+                categoryName: "Retratos",
+                url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80",
+                author: "Lucas Benítez",
+                avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=80",
+                location: "Nueva York, EE.UU.",
+                date: "2026-03-05",
+                likes: 580,
+                isLiked: false,
+                camera: "Canon EOS R3 &bull; 85mm &bull; f/1.2 &bull; 1/800s",
+                tags: ["Mirada", "Urbano", "Sonrisa", "Gente"]
+            },
+            {
+                id: 11,
+                title: "Atardecer Dorado en el Océano",
+                category: "naturaleza",
+                categoryName: "Naturaleza",
+                url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+                author: "Mateo Silva",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
+                location: "Hawái, EE.UU.",
+                date: "2025-10-14",
+                likes: 620,
+                isLiked: true,
+                camera: "Sony A7 IV &bull; 16-35mm &bull; f/11 &bull; 1/60s",
+                tags: ["Playa", "Mar", "Atardecer", "Sol"]
+            },
+            {
+                id: 12,
+                title: "Cúpula de Vidrio Contemporánea",
+                category: "arquitectura",
+                categoryName: "Arquitectura",
+                url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+                author: "Adrian Dupont",
+                avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&q=80",
+                location: "Londres, Reino Unido",
+                date: "2026-02-02",
+                likes: 388,
+                isLiked: false,
+                camera: "Fujifilm GFX 100S &bull; 32-64mm &bull; f/8 &bull; 1/250s",
+                tags: ["Vidrio", "Diseño", "Estructura", "Geometría"]
+            }
+        ];
+
+        let currentCategory = "todos";
+        let searchQuery = "";
+        let currentSort = "popular";
+        let currentViewMode = "grid"; // "grid" or "list"
+        let currentFilteredList = [...galleryData];
+        let currentLightboxIndex = 0;
+
+        // DOM Elements
+        const galleryContainer = document.getElementById("gallery-container");
+        const emptyState = document.getElementById("empty-state");
+        const searchInput = document.getElementById("search-input");
+        const btnClearSearch = document.getElementById("btn-clear-search");
+        const sortSelect = document.getElementById("sort-select");
+        const categoryPills = document.getElementById("category-pills");
+        const btnViewGrid = document.getElementById("btn-view-grid");
+        const btnViewList = document.getElementById("btn-view-list");
+        const btnResetFilters = document.getElementById("btn-reset-filters");
+
+        // Stats Elements
+        const statTotalPhotos = document.getElementById("stat-total-photos");
+        const statTotalLikes = document.getElementById("stat-total-likes");
+
+        // Modal Elements
+        const lightboxModalEl = document.getElementById("lightboxModal");
+        const bsLightboxModal = new bootstrap.Modal(lightboxModalEl);
+        const modalImage = document.getElementById("modal-image");
+        const modalTitle = document.getElementById("lightboxModalLabel");
+        const modalCategory = document.getElementById("modal-category");
+        const modalAuthorName = document.getElementById("modal-author-name");
+        const modalAuthorAvatar = document.getElementById("modal-author-avatar");
+        const modalLocation = document.getElementById("modal-location");
+        const modalDate = document.getElementById("modal-date");
+        const modalCameraInfo = document.getElementById("modal-camera-info");
+        const modalTagsContainer = document.getElementById("modal-tags-container");
+        const modalLikeBtn = document.getElementById("modal-like-btn");
+        const modalLikeCount = document.getElementById("modal-like-count");
+        const modalDownloadBtn = document.getElementById("modal-download-btn");
+        const modalBtnPrev = document.getElementById("modal-btn-prev");
+        const modalBtnNext = document.getElementById("modal-btn-next");
+
+        // Toast
+        const liveToastEl = document.getElementById("liveToast");
+        const bsToast = new bootstrap.Toast(liveToastEl);
+        const toastMessage = document.getElementById("toast-message");
+        const toastIcon = document.getElementById("toast-icon");
+
+        // Core Gallery Rendering Logic
+        function renderGallery() {
+            // 1. Filter by category
+            let filtered = galleryData.filter(item => {
+                if (currentCategory !== "todos" && item.category !== currentCategory) {
+                    return false;
+                }
+                // 2. Filter by Search Query
+                if (searchQuery.trim() !== "") {
+                    const q = searchQuery.toLowerCase();
+                    const matchTitle = item.title.toLowerCase().includes(q);
+                    const matchAuthor = item.author.toLowerCase().includes(q);
+                    const matchLocation = item.location.toLowerCase().includes(q);
+                    const matchTags = item.tags.some(tag => tag.toLowerCase().includes(q));
+                    return matchTitle || matchAuthor || matchLocation || matchTags;
+                }
+                return true;
+            });
+
+            // 3. Apply Sorting
+            filtered.sort((a, b) => {
+                if (currentSort === "popular") return b.likes - a.likes;
+                if (currentSort === "recent") return new Date(b.date) - new Date(a.date);
+                if (currentSort === "alpha-asc") return a.title.localeCompare(b.title);
+                if (currentSort === "alpha-desc") return b.title.localeCompare(a.title);
+                return 0;
+            });
+
+            currentFilteredList = filtered;
+
+            // Render UI
+            if (filtered.length === 0) {
+                galleryContainer.innerHTML = "";
+                emptyState.classList.remove("d-none");
+            } else {
+                emptyState.classList.add("d-none");
+                galleryContainer.innerHTML = filtered.map((item, index) => createCardHTML(item, index)).join("");
+            }
+
+            updateStats();
+        }
+
+        // HTML Template for Cards
+        function createCardHTML(item, index) {
+            const isLikedClass = item.isLiked ? "liked" : "";
+            const heartIcon = item.isLiked ? "bi-heart-fill" : "bi-heart";
+
+            return `
+                <div class="col gallery-item">
+                    <div class="card gallery-card h-100 border-0 shadow-sm">
+                        <!-- Image Container -->
+                        <div class="img-wrapper" onclick="openLightbox(${index})">
+                            <img src="${item.url}" alt="${item.title}" loading="lazy" class="card-img-top">
+                            <div class="card-img-overlay-custom">
+                                <span class="badge bg-dark bg-opacity-75 backdrop-blur text-white rounded-pill px-3 py-1">
+                                    <i class="bi bi-arrows-angle-expand me-1"></i> Ampliar
+                                </span>
+                            </div>
+                            <span class="position-absolute top-0 start-0 m-3 badge badge-category rounded-pill px-3 py-1">
+                                ${item.categoryName}
+                            </span>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body d-flex flex-column justify-content-between p-3">
+                            <div>
+                                <h6 class="card-title fw-bold text-white mb-1 text-truncate" title="${item.title}">
+                                    ${item.title}
+                                </h6>
+                                <p class="card-text small text-secondary mb-2">
+                                    <i class="bi bi-geo-alt me-1"></i>${item.location}
+                                </p>
+                            </div>
+
+                            <!-- Card Footer Controls -->
+                            <div class="d-flex align-items-center justify-content-between pt-2 mt-2 border-top border-secondary border-opacity-10">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="${item.avatar}" alt="${item.author}" class="rounded-circle" width="28" height="28">
+                                    <span class="small fw-medium text-slate-300 text-truncate" style="max-width: 110px;">
+                                        ${item.author}
+                                    </span>
+                                </div>
+                                
+                                <button class="btn btn-sm btn-like ${isLikedClass} rounded-pill px-2 py-1 d-flex align-items-center gap-1" 
+                                        onclick="toggleLike(event, ${item.id})" 
+                                        aria-label="Me gusta">
+                                    <i class="bi ${heartIcon}"></i>
+                                    <span class="small fw-semibold">${item.likes}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Open Modal at specific index of currentFilteredList
+        function openLightbox(index) {
+            if (index < 0 || index >= currentFilteredList.length) return;
+
+            currentLightboxIndex = index;
+            const item = currentFilteredList[index];
+
+            modalImage.src = item.url;
+            modalTitle.textContent = item.title;
+            modalCategory.textContent = item.categoryName;
+            modalAuthorName.textContent = item.author;
+            modalAuthorAvatar.src = item.avatar;
+            modalLocation.textContent = item.location;
+            
+            // Format date (e.g., "15 mar 2026")
+            const dateObj = new Date(item.date);
+            modalDate.textContent = dateObj.toLocaleDateString("es-ES", { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            modalCameraInfo.innerHTML = `<i class="bi bi-camera me-1"></i> ${item.camera}`;
+            modalLikeCount.textContent = item.likes;
+
+            // Like state in Modal
+            if (item.isLiked) {
+                modalLikeBtn.classList.add("liked");
+                modalLikeBtn.querySelector("i").className = "bi bi-heart-fill";
+            } else {
+                modalLikeBtn.classList.remove("liked");
+                modalLikeBtn.querySelector("i").className = "bi bi-heart";
+            }
+
+            // Tags
+            modalTagsContainer.innerHTML = item.tags.map(t => 
+                `<span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal">#${t}</span>`
+            ).join("");
+
+            // Disable/Hide Prev or Next buttons if at boundaries
+            modalBtnPrev.style.display = currentFilteredList.length > 1 ? "flex" : "none";
+            modalBtnNext.style.display = currentFilteredList.length > 1 ? "flex" : "none";
+
+            bsLightboxModal.show();
+        }
+
+        function navigateModal(direction) {
+            if (currentFilteredList.length <= 1) return;
+            currentLightboxIndex = (currentLightboxIndex + direction + currentFilteredList.length) % currentFilteredList.length;
+            openLightbox(currentLightboxIndex);
+        }
+
+        function toggleLike(event, itemId) {
+            if (event) event.stopPropagation();
+
+            const item = galleryData.find(i => i.id === itemId);
+            if (!item) return;
+
+            item.isLiked = !item.isLiked;
+            if (item.isLiked) {
+                item.likes++;
+                showToast("Añadido a tus fotos favoritas", "bi-heart-fill text-danger");
+            } else {
+                item.likes--;
+                showToast("Eliminado de favoritos", "bi-heart text-secondary");
+            }
+
+            // Sync Modal if current item is opened
+            if (currentFilteredList[currentLightboxIndex] && currentFilteredList[currentLightboxIndex].id === itemId) {
+                modalLikeCount.textContent = item.likes;
+                if (item.isLiked) {
+                    modalLikeBtn.classList.add("liked");
+                    modalLikeBtn.querySelector("i").className = "bi bi-heart-fill";
+                } else {
+                    modalLikeBtn.classList.remove("liked");
+                    modalLikeBtn.querySelector("i").className = "bi bi-heart";
+                }
+            }
+
+            renderGallery();
+        }
+
+        // Download Simulation
+        function simulateDownload(item) {
+            showToast(`Descargando "${item.title}" en 4K HD...`, "bi-download text-primary");
+            
+            // Create a temporary anchor to trigger real image download simulation
+            setTimeout(() => {
+                const a = document.createElement("a");
+                a.href = item.url;
+                a.target = "_blank";
+                a.download = `${item.title.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }, 800);
+        }
+
+        function updateStats() {
+            statTotalPhotos.textContent = galleryData.length;
+            const totalLikes = galleryData.reduce((acc, curr) => acc + curr.likes, 0);
+            statTotalLikes.textContent = totalLikes;
+        }
+
+        function showToast(message, iconClass = "bi-check-circle-fill text-success") {
+            toastMessage.textContent = message;
+            toastIcon.className = `bi ${iconClass} fs-5`;
+            bsToast.show();
+        }
+
+        // Search Input Event
+        searchInput.addEventListener("input", (e) => {
+            searchQuery = e.target.value;
+            btnClearSearch.style.display = searchQuery.length > 0 ? "block" : "none";
+            renderGallery();
+        });
+
+        btnClearSearch.addEventListener("click", () => {
+            searchInput.value = "";
+            searchQuery = "";
+            btnClearSearch.style.display = "none";
+            renderGallery();
+        });
+
+        // Category Pill Filter Events
+        categoryPills.addEventListener("click", (e) => {
+            const btn = e.target.closest(".nav-link");
+            if (!btn) return;
+
+            categoryPills.querySelectorAll(".nav-link").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            currentCategory = btn.getAttribute("data-category");
+            renderGallery();
+        });
+
+        // Sorting Event
+        sortSelect.addEventListener("change", (e) => {
+            currentSort = e.target.value;
+            renderGallery();
+        });
+
+        // View Mode Toggle Events
+        btnViewGrid.addEventListener("click", () => {
+            btnViewGrid.classList.add("active");
+            btnViewList.classList.remove("active");
+            currentViewMode = "grid";
+            galleryContainer.className = "row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 transition-all";
+            galleryContainer.classList.remove("view-list");
+        });
+
+        btnViewList.addEventListener("click", () => {
+            btnViewList.classList.add("active");
+            btnViewGrid.classList.remove("active");
+            currentViewMode = "list";
+            galleryContainer.className = "row row-cols-1 g-3 view-list transition-all";
+        });
+
+        // Reset Filters Button
+        btnResetFilters.addEventListener("click", () => {
+            searchInput.value = "";
+            searchQuery = "";
+            currentCategory = "todos";
+            currentSort = "popular";
+            sortSelect.value = "popular";
+            btnClearSearch.style.display = "none";
+
+            categoryPills.querySelectorAll(".nav-link").forEach(b => {
+                b.classList.toggle("active", b.getAttribute("data-category") === "todos");
+            });
+
+            renderGallery();
+        });
+
+        // Lightbox Modal Controls
+        modalBtnPrev.addEventListener("click", () => navigateModal(-1));
+        modalBtnNext.addEventListener("click", () => navigateModal(1));
+
+        modalLikeBtn.addEventListener("click", () => {
+            if (currentFilteredList[currentLightboxIndex]) {
+                toggleLike(null, currentFilteredList[currentLightboxIndex].id);
+            }
+        });
+
+        modalDownloadBtn.addEventListener("click", () => {
+            if (currentFilteredList[currentLightboxIndex]) {
+                simulateDownload(currentFilteredList[currentLightboxIndex]);
+            }
+        });
+
+        // Keyboard Navigation for Lightbox Modal
+        document.addEventListener("keydown", (e) => {
+            if (!lightboxModalEl.classList.contains("show")) return;
+
+            if (e.key === "ArrowLeft") {
+                navigateModal(-1);
+            } else if (e.key === "ArrowRight") {
+                navigateModal(1);
+            }
+        });
+
+        // Initial Load Call
+        window.addEventListener("DOMContentLoaded", () => {
+            renderGallery();
+        });
+    </script>
+</body>
+</html>
